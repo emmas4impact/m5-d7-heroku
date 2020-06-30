@@ -2,11 +2,14 @@ const express = require("express")
 const path = require("path")
 const { check, validationResult, sanitizeBody } = require("express-validator")
 const fs = require("fs-extra")
+const uniqid = require("uniqid")
 const multer = require("multer")
 const { join } = require("path")
 const { readDB, writeDB } = require("../../utilities")
+const x = require("uniqid")
 
 const booksJsonPath = path.join(__dirname, "books.json")
+const commentsJsonPath = path.join(__dirname, "comments.json")
 
 const booksFolder = join(__dirname, "../../../public/img/books/")
 const upload = multer({})
@@ -128,6 +131,74 @@ booksRouter.post("/upload", upload.single("avatar"), async (req, res, next) => {
     next(error)
   }
   res.send("OK")
+})
+
+booksRouter.get("/:asin/comments", async(req, res, next)=>{
+  try {
+    const comments = await readDB(commentsJsonPath)
+    
+    res.send(comments)
+  } catch (error) {
+    console.log(error)
+    const err = new Error("While reading books list a problem occurred!")
+    next(err)
+  }
+})
+
+booksRouter.get("/:asin/comments/CommentID", async(req, res, next)=>{
+  try {
+    const commentDb = await readDB(commentsJsonPath)
+    const commentFilterd = commentDb.find((c)=> c.CommentID===req.params.CommentID)
+    if(commentFilterd ){
+      res.send(commentFilterd )
+    }else{
+      const error = new Error()
+      error.httpStatusCode = 404
+      next(error)
+    }
+   // res.send(commentFilterd)
+  } catch (error) {
+    console.log(error)
+    next("While reading books list a problem occurred!")
+  }
+  
+})
+
+booksRouter.post("/:asin/comments", async(req, res, next)=>{
+  try {
+    const comments = await readDB(commentsJsonPath)
+    const newComment ={...req.body, CommentID:uniqid(), BookId: req.params.asin, createdAt: new Date() }
+    
+    comments.push(newComment)
+    await writeDB(commentsJsonPath, comments )
+    res.status(201).send("Comment Created")
+    
+  } catch (error) {
+    console.log(error)
+    const err = new Error("While reading books list a problem occurred!")
+    next(err)
+  }
+  
+  
+})
+booksRouter.delete("/:asin/comments/CommentID", async(req, res, next)=>{
+  try {
+    const commentDb = await readDB(commentsJsonPath)
+    const commentFilterd = commentDb.find((c)=> c.CommentID===req.params.CommentID)
+    if(commentFilterd ){
+      await writeDB(commentsJsonPath, commentDb.filter((x) => x.CommentID !== req.params.CommentID))
+      res.send("Deleted")
+    }else{
+      const error = new Error(`Book with asin ${req.params.CommentID} not found`)
+      error.httpStatusCode = 404
+      next(error)
+    }
+   // res.send(commentFilterd)
+  } catch (error) {
+    console.log(error)
+    next("While reading books list a problem occurred!")
+  }
+  
 })
 
 module.exports = booksRouter

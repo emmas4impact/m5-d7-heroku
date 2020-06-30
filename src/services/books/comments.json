@@ -1,0 +1,19 @@
+[{
+    "UserName": "emma",
+    "Text": "what a lovely book!",
+    "CommentID": "a3ejdj8kc1y9ez4",
+    "BookId": "1940026091",
+    "createdAt": "2020-06-30T13:11:22.383Z"
+}, {
+    "UserName": "ola",
+    "Text": "Lovely writeups bu author and a good read!!",
+    "CommentID": "a3ej6n8kc1yzvfn",
+    "BookId": "1250082757",
+    "createdAt": "2020-06-30T13:31:56.770Z"
+}, {
+    "UserName": "ola",
+    "Text": "This first time I'M reading a Sci-Fi book damn, its what the read! Jeez",
+    "CommentID": "a3ejezkkc1z6msn",
+    "BookId": "045146799X",
+    "createdAt": "2020-06-30T13:37:12.166Z"
+}]
