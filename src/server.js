@@ -23,7 +23,7 @@ server.use(express.json())
 const whitelist =
   process.env.NODE_ENV === "production"
     ? [process.env.FE_URL]
-    : ["http://localhost:3000", "http://localhost:3002"]
+    : ["http://localhost:3000"]
 
 const corsOptions = {
   origin: function (origin, callback) {
