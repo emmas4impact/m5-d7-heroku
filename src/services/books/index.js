@@ -145,7 +145,7 @@ booksRouter.get("/:asin/comments", async(req, res, next)=>{
   }
 })
 
-booksRouter.get("/:asin/comments/CommentID", async(req, res, next)=>{
+booksRouter.get("/:asin/comments/:CommentID", async(req, res, next)=>{
   try {
     const commentDb = await readDB(commentsJsonPath)
     const commentFilterd = commentDb.find((c)=> c.CommentID===req.params.CommentID)
@@ -159,7 +159,7 @@ booksRouter.get("/:asin/comments/CommentID", async(req, res, next)=>{
    // res.send(commentFilterd)
   } catch (error) {
     console.log(error)
-    next("While reading books list a problem occurred!")
+    next("While reading comment list a problem occurred!")
   }
   
 })
@@ -175,13 +175,13 @@ booksRouter.post("/:asin/comments", async(req, res, next)=>{
     
   } catch (error) {
     console.log(error)
-    const err = new Error("While reading books list a problem occurred!")
+    const err = new Error("While reading comment list a problem occurred!")
     next(err)
   }
   
   
 })
-booksRouter.delete("/:asin/comments/CommentID", async(req, res, next)=>{
+booksRouter.delete("/:asin/comments/:CommentID", async(req, res, next)=>{
   try {
     const commentDb = await readDB(commentsJsonPath)
     const commentFilterd = commentDb.find((c)=> c.CommentID===req.params.CommentID)
