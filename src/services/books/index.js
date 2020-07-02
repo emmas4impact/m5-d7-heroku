@@ -206,43 +206,47 @@ booksRouter.delete("/:asin/comments/:CommentID", async(req, res, next)=>{
 
 booksRouter.get("/sumTwoPrices", async (req, res, next) => {
   try {
-    const { intA, intB } = req.query
-
-    if (intA && intB) {
-      const xmlRequest = begin({
-        version: "1.0",
-        encoding: "utf-8",
+    const data = await readDB(booksJsonPath)
+    const bookA = data.filter(book => book.asin === req.query.intA )
+    const priceA = bookA.map(book => book.price)
+    console.log(priceA[0])
+    const bookB = data.filter(book => book.asin === req.query.intB)
+    const priceB = bookB.map(book => book.price)
+    console.log(priceB[0])
+  if (priceA && priceB) {
+    const xmlRequest = begin({
+      version: "1.0",
+      encoding: "utf-8",
+    })
+      .ele("soap12:Envelope", {
+        "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+        "xmlns:soap12": "http://www.w3.org/2003/05/soap-envelope"
       })
-        .ele("soap12:Envelope", {
-          "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-          "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-          "xmlns:soap12": "http://www.w3.org/2003/05/soap-envelope"
-        })
-        .ele("soap12:Body")
-        .ele("Add", {
-          xmlns: "http://tempuri.org/",
-        })
-        .ele("intA")
-        .text(intA)
-        .up()
-        .ele("intB")
-        .text(intB)
-        .end()
-
-      const response = await axios({
-        method: "post",
-        url: "http://www.dneonline.com/calculator.asmx?op=Add",
-        data: xmlRequest,
-        headers: { "Content-type": "text/xml" },
+      .ele("soap12:Body")
+      .ele("Add", {
+        xmlns: "http://tempuri.org/",
       })
-      res.send(response.data)
-    } else {
-      next(new Error("Please send 2 numbers as query parameters"))
-    }
-  } catch (error) {
-    next(error)
+      .ele("intA")
+      .text(Math.round(priceA[0]))
+      .up()
+      .ele("intB")
+      .text(Math.round(priceB[0]))
+      .end()
+    const response = await axios({
+      method: "post",
+      url:
+        "http://www.dneonline.com/calculator.asmx?op=Add",
+      data: xmlRequest,
+      headers: { "Content-type": "text/xml" },
+    })
+    res.send(response.data)
+  } else {
+    next(new Error("Please send 2 different prices as query parameters"))
   }
-
+} catch (error) {
+  next(error)
+}
 })
 
 module.exports = booksRouter
