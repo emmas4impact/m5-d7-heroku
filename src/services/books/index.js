@@ -7,6 +7,9 @@ const multer = require("multer")
 const { join } = require("path")
 const { readDB, writeDB } = require("../../utilities")
 const x = require("uniqid")
+const {xml2js} = require("xml-js")
+const axios =require("axios")
+const { begin } = require("xmlbuilder")
 
 const booksJsonPath = path.join(__dirname, "books.json")
 const commentsJsonPath = path.join(__dirname, "comments.json")
@@ -199,6 +202,47 @@ booksRouter.delete("/:asin/comments/:CommentID", async(req, res, next)=>{
     next("While reading books list a problem occurred!")
   }
   
+})
+
+booksRouter.get("/sumTwoPrices", async (req, res, next) => {
+  try {
+    const { intA, intB } = req.query
+
+    if (intA && intB) {
+      const xmlRequest = begin({
+        version: "1.0",
+        encoding: "utf-8",
+      })
+        .ele("soap12:Envelope", {
+          "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+          "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+          "xmlns:soap12": "http://www.w3.org/2003/05/soap-envelope"
+        })
+        .ele("soap12:Body")
+        .ele("Add", {
+          xmlns: "http://tempuri.org/",
+        })
+        .ele("intA")
+        .text(intA)
+        .up()
+        .ele("intB")
+        .text(intB)
+        .end()
+
+      const response = await axios({
+        method: "post",
+        url: "http://www.dneonline.com/calculator.asmx?op=Add",
+        data: xmlRequest,
+        headers: { "Content-type": "text/xml" },
+      })
+      res.send(response.data)
+    } else {
+      next(new Error("Please send 2 numbers as query parameters"))
+    }
+  } catch (error) {
+    next(error)
+  }
+
 })
 
 module.exports = booksRouter
