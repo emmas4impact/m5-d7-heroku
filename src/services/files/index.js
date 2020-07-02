@@ -36,15 +36,7 @@ filesRouter.post("/sendEmail", async (req, res, next) => {
       subject: "You know what time it is",
       text: "and easy to do anywhere, even with Node.js",
       html: "<strong>and easy to do anywhere, even with Node.js</strong>",
-      attachments: [
-        {
-          content: 'Some base 64 encoded attachment content',
-          filename: 'some-attachment.txt',
-          type: 'plain/text',
-          disposition: 'attachment',
-          contentId: 'mytext'
-        },
-      ],
+    
     }
 
     await sgMail.send(msg)
