@@ -204,16 +204,16 @@ booksRouter.delete("/:asin/comments/:CommentID", async(req, res, next)=>{
   
 })
 
-booksRouter.get("/sumTwoPrices", async (req, res, next) => {
+booksRouter.get("/xml/sumTwoPrices", async (req, res, next) => {
   try {
     const data = await readDB(booksJsonPath)
-    const bookA = data.filter(book => book.asin === req.query.intA )
+    const bookA = data.filter(book => book.asin === req.query.intA || book.asin === req.query.intB )
     const priceA = bookA.map(book => book.price)
     console.log(priceA[0])
-    const bookB = data.filter(book => book.asin === req.query.intB)
-    const priceB = bookB.map(book => book.price)
-    console.log(priceB[0])
-  if (priceA && priceB) {
+   // const bookB = data.filter(book => book.asin === req.query.intB)
+   // const priceB = bookB.map(book => book.price)
+    //console.log(priceB[0])
+  if (priceA[0] && priceA[1] ) {
     const xmlRequest = begin({
       version: "1.0",
       encoding: "utf-8",
@@ -231,14 +231,14 @@ booksRouter.get("/sumTwoPrices", async (req, res, next) => {
       .text(Math.round(priceA[0]))
       .up()
       .ele("intB")
-      .text(Math.round(priceB[0]))
+      .text(Math.round(priceA[1]))
       .end()
     const response = await axios({
       method: "post",
       url:
         "http://www.dneonline.com/calculator.asmx?op=Add",
       data: xmlRequest,
-      headers: { "Content-type": "text/xml" },
+      headers: { "Content-type": "application/soap+xml" },
     })
     res.send(response.data)
   } else {
