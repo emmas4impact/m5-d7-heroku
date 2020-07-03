@@ -2,12 +2,27 @@ openapi: 3.0.1
 info:
   title: striveBooks API
   description: book Library
+  version: 1.0.0
 servers:
-  - Url: http://localhost:3001
+  - url: http://localhost:3001
     description: Local server
-  - Url: https://strive-d7-test.herokuapp.com
+  - url: https://strive-d7-test.herokuapp.com
     description: Cloud server
 tags:
   - name: books
+    description: Operations about books
   - name: files
+    description: Operation about files
   - name: xml
+    description: Usage of xmlbuilder
+  - name: attendees  
+paths:
+  /books:
+    get:
+      tags: 
+        - books
+      responses:
+        "200":
+          description: Cloud server
+            
+   
